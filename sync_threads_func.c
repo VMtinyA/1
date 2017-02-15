@@ -61,15 +61,12 @@ void threads_create(void) {
 void *thread_manager(void *param) {
 
     threads_create();
-    thread_1_divider = 0;
+    unsigned char thread_1_divider = 0;
 
     while (1) {
 
         // попытка захвата семафора semSI2 (должен быть выдан обработчиком прерывания SI2)
         sem_wait(&sem_SI2);
-
-        //
-        printf("tm\n");
 
         // управление потоками
         sem_post(&sem_0);

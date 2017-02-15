@@ -27,11 +27,21 @@ pthread_t thread_2_id;
 struct sched_param thread_sched;
 int thread_policy;
 
-unsigned char thread_1_divider;
-
+// функция должна создать поток - диспетчер для управления синхронными потоками f0, f1, f2
+// эта функция вводится для "инкапсуляции" всего, что принадлежит синхронным потокам, в данном модуле
+// должна вызываться в main основной программы
 void sync_threads_start(void);
+
+// вспомогательная функция для создания всех циклических синхронных потоков
+// и инициализации всех их семафоров
+// для вызова из функции-диспетчера
 void threads_create(void);
+
+// функция-диспетчер циклических потоков
+// при вызове должна создать все потоки и управлять ими
 void *thread_manager(void *param);
+
+// функции потоков
 void *thread_0(void *param);
 void *thread_1(void *param);
 void *thread_2(void *param);
