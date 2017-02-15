@@ -7,4 +7,8 @@ CONFIG -= qt
 
 LIBS += -lpthread
 
-SOURCES += main.c
+SOURCES += main.c \
+    sync_threads_func.c
+
+HEADERS += \
+    sync_threads_func.h
