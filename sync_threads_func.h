@@ -3,6 +3,8 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <errno.h>
+#include <sched.h>
 #include <stdio.h> // для отладки, потом отключить
 
 #define Frequency0          1000
@@ -14,7 +16,7 @@ sem_t sem_0;
 sem_t sem_1;
 sem_t sem_2;
 
-pthread_attr_t thread_attr;
+pthread_attr_t thread_manager_attr;
 pthread_attr_t thread_0_attr;
 pthread_attr_t thread_1_attr;
 pthread_attr_t thread_2_attr;
@@ -24,8 +26,11 @@ pthread_t thread_0_id;
 pthread_t thread_1_id;
 pthread_t thread_2_id;
 
-struct sched_param thread_sched;
-int thread_policy;
+struct sched_param thread_sched; // для задания приоритетов
+int max_priority;
+int min_priority;
+
+int ret, ret0, ret1, ret2; // для контроля создания потоков
 
 // функция должна создать поток - диспетчер для управления синхронными потоками f0, f1, f2
 // эта функция вводится для "инкапсуляции" всего, что принадлежит синхронным потокам, в данном модуле
