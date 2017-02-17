@@ -5,50 +5,49 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <sched.h>
-#include <stdio.h> // для отладки, потом отключить
+#include <stdio.h>
+#include <stdlib.h>
+
+//****************************************************************************************************************
+/* Константы */
 
 #define Frequency0          1000
-#define Frequency1          100
-#define Frequency2          0.1
+#define Frequency1          200
+#define Frequency2          500
 
-sem_t sem_SI2;
-sem_t sem_0;
-sem_t sem_1;
-sem_t sem_2;
+#define SYNCTHREADSNUM          3      // макс. число используемых потоков
+#define MAXPRIORITY_FIFO         99     // макс. приоритет для стратегии планирования FIFO
 
-pthread_attr_t thread_manager_attr;
-pthread_attr_t thread_0_attr;
-pthread_attr_t thread_1_attr;
-pthread_attr_t thread_2_attr;
+//******************************************************************************
+/* Параметры потоков и глобальные переменные */
 
-pthread_t thread_manager_id;
-pthread_t thread_0_id;
-pthread_t thread_1_id;
-pthread_t thread_2_id;
+/* параметры потоков управления */
+typedef struct {
+       unsigned short isComplete;       // флаг для проверки завершения потока
+       int priority;                // значение приоритета (1 - 99)
+       //struct data;          // структура для данных, передаваемых в реальную функцию потока
+} THREAD_ARG;
 
-struct sched_param thread_sched; // для задания приоритетов
-int max_priority;
-int min_priority;
+/* глобальные переменные */
+sem_t sem_SI2; // семафор для прерывания по СИ2 (выдает обработчик прерывания)
 
-int ret, ret0, ret1, ret2; // для контроля создания потоков
+//****************************************************************************
+/* Прототипы функций */
+
+/* Функции дочерних потоков */
+// служат "обертками" для вызова реальных функций
+static void *func0 (void *param);
+static void *func1 (void *param);
+static void *func2 (void *param);
+
+// функция-диспетчер циклических потоков
+// при вызове должна создать все потоки и управлять ими
+static void *thread_manager (void *param);
 
 // функция должна создать поток - диспетчер для управления синхронными потоками f0, f1, f2
 // эта функция вводится для "инкапсуляции" всего, что принадлежит синхронным потокам, в данном модуле
 // должна вызываться в main основной программы
-void sync_threads_start(void);
+void sync_threads_start (void);
 
-// вспомогательная функция для создания всех циклических синхронных потоков
-// и инициализации всех их семафоров
-// для вызова из функции-диспетчера
-void threads_create(void);
-
-// функция-диспетчер циклических потоков
-// при вызове должна создать все потоки и управлять ими
-void *thread_manager(void *param);
-
-// функции потоков
-void *thread_0(void *param);
-void *thread_1(void *param);
-void *thread_2(void *param);
 
 #endif // THREADS_FUNC_H
